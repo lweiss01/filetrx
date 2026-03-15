@@ -1,0 +1,9 @@
+{
+  "name": "filetrx",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Tiny local network app for sending screenshots or links from phone to laptop.",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

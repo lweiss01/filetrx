@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>filetrx</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Same-Wi-Fi Drop</p>
+          <h1>Send phone screenshots and links straight to your laptop.</h1>
+          <p class="lede">
+            Open this page on both devices. Use the phone form to drop in a screenshot or
+            paste a link, and the laptop inbox updates instantly.
+          </p>
+        </div>
+        <div class="network-card">
+          <p class="card-label">Open On Your Phone</p>
+          <div id="url-list" class="url-list"></div>
+          <p class="hint">Use any local network URL below while both devices are on the same Wi-Fi.</p>
+          <p class="hint">For one-tap phone access later, add this page to your phone home screen from the browser menu.</p>
+          <p class="hint">For one-tap laptop access, use <strong>launch-filetrx.cmd</strong>. If you want it always ready, run <strong>enable-filetrx-autostart.cmd</strong> once.</p>
+        </div>
+      </section>
+
+      <section class="grid">
+        <section class="panel send-panel">
+          <div class="panel-head">
+            <p class="panel-kicker">Phone Sender</p>
+            <h2>Quick Share</h2>
+          </div>
+
+          <form id="share-form" class="share-form">
+            <label class="field">
+              <span>Screenshot</span>
+              <input type="file" name="screenshot" accept="image/*" />
+            </label>
+
+            <label class="field">
+              <span>Link</span>
+              <input type="text" name="link" placeholder="example.com or https://..." />
+            </label>
+
+            <label class="field">
+              <span>Note</span>
+              <input type="text" name="note" maxlength="300" placeholder="Optional context" />
+            </label>
+
+            <button class="primary-button" type="submit">Send To Laptop</button>
+            <p id="status" class="status" aria-live="polite"></p>
+          </form>
+        </section>
+
+        <section class="panel inbox-panel">
+          <div class="panel-head">
+            <p class="panel-kicker">Laptop Inbox</p>
+            <h2>Recent Drops</h2>
+          </div>
+          <div id="empty-state" class="empty-state">
+            Nothing yet. Send a screenshot or link from your phone to see it here.
+          </div>
+          <div id="items" class="items"></div>
+        </section>
+      </section>
+    </main>
+
+    <template id="item-template">
+      <article class="item">
+        <div class="item-meta">
+          <span class="pill"></span>
+          <time></time>
+        </div>
+        <p class="item-note"></p>
+        <a class="item-link" target="_blank" rel="noreferrer noopener"></a>
+        <a class="item-image-link" target="_blank" rel="noreferrer noopener">
+          <img class="item-image" alt="Shared screenshot preview" />
+        </a>
+      </article>
+    </template>
+
+    <script src="/app.js" defer></script>
+  </body>
+  </html>
