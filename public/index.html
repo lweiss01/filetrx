@@ -11,10 +11,10 @@
       <section class="hero">
         <div>
           <p class="eyebrow">Same-Wi-Fi Drop</p>
-          <h1>Send phone screenshots and links straight to your laptop.</h1>
+          <h1>Send phone files, links, and notes straight to your laptop.</h1>
           <p class="lede">
-            Open this page on both devices. Use the phone form to drop in a screenshot or
-            paste a link, and the laptop inbox updates instantly.
+            Open this page on both devices. Use the phone form to drop in a file,
+            paste a link, and add a quick note. Your laptop inbox updates instantly.
           </p>
         </div>
         <div class="network-card">
@@ -48,8 +48,8 @@
 
           <form id="share-form" class="share-form">
             <label class="field">
-              <span>Screenshot</span>
-              <input type="file" name="screenshot" accept="image/*" />
+              <span>File</span>
+              <input type="file" name="screenshot" />
             </label>
 
             <label class="field">
@@ -83,7 +83,7 @@
           </div>
 
           <div id="empty-state" class="empty-state">
-            Nothing yet. Send a screenshot or link from your phone to see it here.
+            Nothing yet. Send a file, screenshot, or link from your phone to see it here.
           </div>
           <div id="items" class="items"></div>
         </section>
@@ -95,13 +95,21 @@
     <template id="item-template">
       <article class="item">
         <div class="item-meta">
-          <span class="pill"></span>
           <time></time>
         </div>
         <p class="item-note"></p>
         <a class="item-link" target="_blank" rel="noreferrer noopener"></a>
         <a class="item-image-link" target="_blank" rel="noreferrer noopener">
-          <img class="item-image" alt="Shared screenshot preview" />
+          <img class="item-image" alt="Shared image preview" />
+        </a>
+        <a class="item-file-link" target="_blank" rel="noreferrer noopener">
+          <div class="file-placeholder">
+            <span class="file-ext">FILE</span>
+            <div class="file-meta">
+              <span class="file-name"></span>
+              <span class="file-detail"></span>
+            </div>
+          </div>
         </a>
         <div class="item-actions">
           <button class="item-path-button" type="button">Get path</button>

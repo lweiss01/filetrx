@@ -249,7 +249,7 @@ async function setItemArchived(itemId, archived) {
 async function handleShare(request, response) {
   const parsed = await parseBody(request);
   if (parsed.type !== "form") {
-    return sendError(response, 415, "Use multipart/form-data to submit a link or screenshot.");
+    return sendError(response, 415, "Use multipart/form-data to submit a link or file.");
   }
 
   const form = parsed.data;
@@ -259,7 +259,7 @@ async function handleShare(request, response) {
   const savedFile = file instanceof File ? await saveIncomingFile(file) : null;
 
   if (!linkValue && !savedFile) {
-    return sendError(response, 400, "Add a link or choose a screenshot before sending.");
+    return sendError(response, 400, "Add a link or choose a file before sending.");
   }
 
   const item = {

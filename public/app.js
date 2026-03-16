@@ -31,6 +31,54 @@ function formatTime(iso) {
   }).format(date);
 }
 
+function formatBytes(bytes) {
+  if (!Number.isFinite(bytes) || bytes <= 0) {
+    return "";
+  }
+
+  if (bytes < 1024) {
+    return `${bytes} B`;
+  }
+
+  const units = ["KB", "MB", "GB"];
+  let value = bytes / 1024;
+  let unitIndex = 0;
+
+  while (value >= 1024 && unitIndex < units.length - 1) {
+    value /= 1024;
+    unitIndex += 1;
+  }
+
+  const rounded = value >= 10 ? Math.round(value) : Math.round(value * 10) / 10;
+  return `${rounded} ${units[unitIndex]}`;
+}
+
+function getFileExtension(fileName) {
+  if (!fileName || !fileName.includes(".")) {
+    return "FILE";
+  }
+
+  const ext = fileName.split(".").pop();
+  if (!ext) {
+    return "FILE";
+  }
+
+  return ext.toUpperCase().slice(0, 6);
+}
+
+function isImageFile(file) {
+  if (!file) {
+    return false;
+  }
+
+  if (typeof file.mimeType === "string" && file.mimeType.startsWith("image/")) {
+    return true;
+  }
+
+  const name = (file.displayName || file.storedName || "").toLowerCase();
+  return /\.(png|jpe?g|gif|webp|bmp|svg|heic|heif)$/.test(name);
+}
+
 function setStatus(message, isError = false) {
   statusNode.textContent = message;
   statusNode.style.color = isError ? "#8b1e19" : "";
@@ -205,22 +253,24 @@ function renderItems() {
   emptyNode.textContent =
     state.view === "archived"
       ? "No archived drops yet. Archive items from the Inbox tab to keep them for later."
-      : "Nothing yet. Send a screenshot or link from your phone to see it here.";
+      : "Nothing yet. Send a file, screenshot, or link from your phone to see it here.";
 
   visibleItems.forEach((item) => {
     const fragment = template.content.cloneNode(true);
     const root = fragment.querySelector(".item");
-    const pill = fragment.querySelector(".pill");
     const time = fragment.querySelector("time");
     const note = fragment.querySelector(".item-note");
     const link = fragment.querySelector(".item-link");
     const imageLink = fragment.querySelector(".item-image-link");
     const image = fragment.querySelector(".item-image");
+    const fileLink = fragment.querySelector(".item-file-link");
+    const fileExt = fragment.querySelector(".file-ext");
+    const fileName = fragment.querySelector(".file-name");
+    const fileDetail = fragment.querySelector(".file-detail");
     const pathButton = fragment.querySelector(".item-path-button");
     const archiveButton = fragment.querySelector(".item-archive-button");
     const archived = isArchived(item);
 
-    pill.textContent = item.type;
     time.textContent = formatTime(item.createdAt);
     time.dateTime = item.createdAt;
     note.textContent = item.note || "";
@@ -233,11 +283,27 @@ function renderItems() {
     }
 
     if (item.file?.url) {
-      imageLink.href = item.file.url;
-      image.title = item.file.displayName || "Open image";
-      image.src = item.file.url;
+      const imageFile = isImageFile(item.file);
+
+      if (imageFile) {
+        imageLink.href = item.file.url;
+        image.title = item.file.displayName || "Open image";
+        image.src = item.file.url;
+        fileLink.remove();
+      } else {
+        const displayName = item.file.displayName || item.file.storedName || "Attached file";
+        const sizeLabel = formatBytes(item.file.size);
+
+        fileLink.href = item.file.url;
+        fileLink.title = `Open ${displayName}`;
+        fileExt.textContent = getFileExtension(displayName);
+        fileName.textContent = displayName;
+        fileDetail.textContent = sizeLabel || "File";
+        imageLink.remove();
+      }
     } else {
       imageLink.remove();
+      fileLink.remove();
     }
 
     if (item.file?.absPath) {
@@ -247,10 +313,10 @@ function renderItems() {
         try {
           const copied = await copyTextToClipboard(item.file.absPath);
           pathButton.textContent = copied ? "Copied" : "Copy failed";
-          setStatus(copied ? "Copied image path to clipboard." : "Could not copy image path.", !copied);
+          setStatus(copied ? "Copied file path to clipboard." : "Could not copy file path.", !copied);
         } catch (_error) {
           pathButton.textContent = "Copy failed";
-          setStatus("Could not copy image path.", true);
+          setStatus("Could not copy file path.", true);
         }
 
         setTimeout(() => {
