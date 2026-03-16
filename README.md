@@ -10,7 +10,7 @@ A lightweight, local-first web app for transferring files, links, and notes from
 
 ## What it does
 
-- Runs as a local web server on your laptop
+- Runs as a local web server on your laptop/desktop
 - Shows local network URLs you can open from your phone
 - Lets you upload a file, paste a link, and add an optional note
 - Updates the laptop inbox instantly with no account, no cloud, and no database
@@ -29,7 +29,7 @@ A lightweight, local-first web app for transferring files, links, and notes from
 
 ## Easiest launch options
 
-### Laptop
+### Windows
 
 - Double-click `launch-filetrx.cmd` to start the server if needed and open the app.
 - If you want it available after every Windows login, double-click `enable-filetrx-autostart.cmd` once.
