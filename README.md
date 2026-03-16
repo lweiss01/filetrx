@@ -6,6 +6,8 @@ Fast phone-to-laptop transfer for files, links, and quick notes over Wi-Fi.
 
 A lightweight, local-first web app for transferring files, links, and notes from your phone to your laptop on the same Wi-Fi, with archive/unarchive and one-click path copy.
 
+**Important:** filetrx currently supports one-way transfer only: **phone -> laptop/PC**. Sending files from laptop/PC to phone is not implemented yet.
+
 ## What it does
 
 - Runs as a local web server on your laptop
