@@ -18,11 +18,24 @@
           </p>
         </div>
         <div class="network-card">
-          <p class="card-label">Open On Your Phone</p>
-          <div id="url-list" class="url-list"></div>
-          <p class="hint">Use any local network URL below while both devices are on the same Wi-Fi.</p>
-          <p class="hint">For one-tap phone access later, add this page to your phone home screen from the browser menu.</p>
-          <p class="hint">For one-tap laptop access, use <strong>launch-filetrx.cmd</strong>. If you want it always ready, run <strong>enable-filetrx-autostart.cmd</strong> once.</p>
+          <div class="network-card-head">
+            <p class="card-label">Open On Your Phone</p>
+            <button
+              id="phone-setup-toggle"
+              class="toggle-button"
+              type="button"
+              aria-controls="phone-setup"
+              aria-expanded="true"
+            >
+              Hide setup
+            </button>
+          </div>
+          <div id="phone-setup" class="phone-setup">
+            <div id="url-list" class="url-list"></div>
+            <p class="hint">Use any local network URL below while both devices are on the same Wi-Fi.</p>
+            <p class="hint">For one-tap phone access later, add this page to your phone home screen from the browser menu.</p>
+            <p class="hint">For one-tap laptop access, use <strong>launch-filetrx.cmd</strong>. If you want it always ready, run <strong>enable-filetrx-autostart.cmd</strong> once.</p>
+          </div>
         </div>
       </section>
 
@@ -59,6 +72,16 @@
             <p class="panel-kicker">Laptop Inbox</p>
             <h2>Recent Drops</h2>
           </div>
+
+          <div class="inbox-toolbar" role="tablist" aria-label="Drop views">
+            <button id="view-active" class="view-toggle is-active" type="button" role="tab" aria-selected="true">
+              Inbox <span id="active-count" class="view-count">0</span>
+            </button>
+            <button id="view-archived" class="view-toggle" type="button" role="tab" aria-selected="false">
+              Archived <span id="archived-count" class="view-count">0</span>
+            </button>
+          </div>
+
           <div id="empty-state" class="empty-state">
             Nothing yet. Send a screenshot or link from your phone to see it here.
           </div>
@@ -66,6 +89,8 @@
         </section>
       </section>
     </main>
+
+    <footer class="app-footer">filetrx <span id="app-version">v--</span></footer>
 
     <template id="item-template">
       <article class="item">
@@ -78,9 +103,13 @@
         <a class="item-image-link" target="_blank" rel="noreferrer noopener">
           <img class="item-image" alt="Shared screenshot preview" />
         </a>
+        <div class="item-actions">
+          <button class="item-path-button" type="button">Get path</button>
+          <button class="item-archive-button" type="button">Archive</button>
+        </div>
       </article>
     </template>
 
     <script src="/app.js" defer></script>
   </body>
-  </html>
+</html>

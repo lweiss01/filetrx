@@ -1,4 +1,3 @@
-
 const http = require("http");
 const fs = require("fs");
 const fsp = require("fs/promises");
@@ -17,6 +16,7 @@ const UPLOADS_DIR = path.join(DATA_DIR, "uploads");
 const ITEMS_FILE = path.join(DATA_DIR, "items.json");
 const MAX_ITEMS = 200;
 const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
+const APP_VERSION = require("./package.json").version || "0.0.0";
 const bus = new EventEmitter();
 
 let items = [];
@@ -84,7 +84,7 @@ function isLikelyPhoneReachable(address) {
   return (
     address.startsWith("192.168.") ||
     address.startsWith("10.") ||
-    /^172.(1[6-9]|2\d|3[0-1])./.test(address)
+    /^172\.(1[6-9]|2\d|3[0-1])\./.test(address)
   );
 }
 
@@ -136,6 +136,7 @@ async function parseBody(request) {
   }
   return { type: "text", data: await webRequest.text() };
 }
+
 async function saveIncomingFile(file) {
   if (!file || typeof file.name !== "string" || file.size === 0) {
     return null;
@@ -157,7 +158,8 @@ async function saveIncomingFile(file) {
     mimeType: file.type || "application/octet-stream",
     size: file.size,
     storedName,
-    url: `/uploads/${storedName}`
+    url: `/uploads/${storedName}`,
+    absPath: outputPath
   };
 }
 
@@ -182,14 +184,66 @@ async function addItem(item) {
   bus.emit("update");
 }
 
+function withResolvedFilePath(item) {
+  if (!item || !item.file) {
+    return item;
+  }
+
+  if (item.file.absPath) {
+    return item;
+  }
+
+  const storedName = item.file.storedName || path.basename(item.file.url || "");
+  if (!storedName) {
+    return item;
+  }
+
+  return {
+    ...item,
+    file: {
+      ...item.file,
+      absPath: path.join(UPLOADS_DIR, path.basename(storedName))
+    }
+  };
+}
+
 function renderState() {
   return {
-    items,
+    appVersion: APP_VERSION,
+    items: items.map(withResolvedFilePath),
     urls: listLocalUrls(),
     limits: {
       maxUploadBytes: MAX_UPLOAD_BYTES
     }
   };
+}
+
+function findItemIndexById(itemId) {
+  return items.findIndex((item) => item && item.id === itemId);
+}
+
+async function setItemArchived(itemId, archived) {
+  const index = findItemIndexById(itemId);
+  if (index === -1) {
+    const error = new Error("Item not found.");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  const nextItem = { ...items[index] };
+
+  if (archived) {
+    if (!nextItem.archivedAt) {
+      nextItem.archivedAt = new Date().toISOString();
+    }
+  } else {
+    delete nextItem.archivedAt;
+  }
+
+  items[index] = nextItem;
+  await persistItems();
+  bus.emit("update");
+  return withResolvedFilePath(nextItem);
 }
 
 async function handleShare(request, response) {
@@ -226,6 +280,17 @@ async function handleShare(request, response) {
 
   await addItem(item);
   return json(response, 201, { ok: true, item });
+}
+
+async function handleArchive(request, response, itemId) {
+  const parsed = await parseBody(request);
+  if (parsed.type !== "json" || !parsed.data || typeof parsed.data !== "object") {
+    return sendError(response, 400, "Send JSON with { archived: true|false }.");
+  }
+
+  const archived = Boolean(parsed.data.archived);
+  const item = await setItemArchived(itemId, archived);
+  return json(response, 200, { ok: true, item });
 }
 
 function serveFile(response, filePath) {
@@ -275,6 +340,12 @@ async function route(request, response) {
     return handleShare(request, response);
   }
 
+  const archiveMatch = url.pathname.match(/^\/api\/items\/([^/]+)\/archive$/);
+  if (request.method === "POST" && archiveMatch) {
+    const itemId = decodeURIComponent(archiveMatch[1]);
+    return handleArchive(request, response, itemId);
+  }
+
   if (request.method === "GET" && url.pathname === "/events") {
     return handleEvents(request, response);
   }
@@ -287,7 +358,7 @@ async function route(request, response) {
 
   if (request.method === "GET") {
     const requested = url.pathname === "/" ? "index.html" : url.pathname.slice(1);
-    const safePath = path.normalize(requested).replace(/^(\.\.[/\\])+/, "");
+    const safePath = path.normalize(requested).replace(/^([.]\.[/\\])+/, "");
     const filePath = path.join(PUBLIC_DIR, safePath);
 
     if (!filePath.startsWith(PUBLIC_DIR)) {
