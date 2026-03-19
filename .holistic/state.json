@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "projectName": "filetrx",
+  "createdAt": "2026-03-19T19:33:17.803Z",
+  "updatedAt": "2026-03-19T19:33:17.805Z",
+  "activeSession": null,
+  "pendingWork": [],
+  "lastHandoff": null,
+  "knownFixes": [],
+  "docIndex": {
+    "masterDoc": "HOLISTIC.md",
+    "stateFile": ".holistic/state.json",
+    "sessionsDir": ".holistic/sessions",
+    "contextDir": ".holistic/context",
+    "adapterDocs": {},
+    "currentPlanDoc": ".holistic/PLAN.md",
+    "protocolDoc": ".holistic/PROTOCOL.md"
+  }
+}
