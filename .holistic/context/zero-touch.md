@@ -37,4 +37,4 @@ Zero-touch architecture exists to close the gap between the current protocol and
 - Prefer workflow-disappearance improvements over adding more visible user ceremony.
 
 Project: filetrx
-Updated: 2026-03-27T00:48:04.035Z
+Updated: 2026-03-28T16:19:01.954Z
