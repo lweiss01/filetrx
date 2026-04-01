@@ -1,60 +1,66 @@
-# AGENTS — filetrx
+# AGENTS
 
-Adapter instructions for every AI agent working on this project.  
-Each section tells you how to integrate with the Holistic tracking system.
+<!-- ═══════════════════════════════════════════════════════════════════
+     AGENT AUTO-START INSTRUCTIONS
+     ═══════════════════════════════════════════════════════════════════
 
----
+  YOU ARE READING THIS FILE AUTOMATICALLY AT SESSION START. GOOD.
+  Now do the following BEFORE responding to the user or doing any work:
 
-## Universal Quick-Start (all agents)
+  1. Read HOLISTIC.md in full.
+  2. Summarise to the user: what was last worked on, what's planned next,
+     and flag any KNOWN FIXES they should be aware of.
+  3. Ask: "What would you like to work on - continue recent work, or start something new?"
+  4. Open the session with the repo-local Holistic helper for this repo.
 
-**At the start of every session:**
-1. Read `HOLISTIC.md` in full.
-2. Read your adapter section below.
-3. Run `holistic start --agent <your-agent-name>`.
-4. Summarise the recap to the user and ask how they want to proceed.
+  DO NOT skip step 1. HOLISTIC.md is the source of truth.
+  ══════════════════════════════════════════════════════════════════ -->
 
-**During the session (automatic via git hook, or manual):**
-- `holistic checkpoint --reason '<what you just did>'`
+## Holistic Protocol
 
-**At the end of every session:**
-- Run `holistic handoff` — this opens an interactive dialog to capture the session summary.
-- If running non-interactively, pass flags: `holistic handoff --summary '...' --next '...'`
+### Product North Star
 
----
+Open repo, start working, Holistic quietly keeps continuity alive.
 
-## Claude / Cowork
+Agents should treat that as the ultimate UX target. Prefer decisions that reduce manual ceremony while making checkpoint, resume, handoff, and regression-awareness more automatic and more reliable.
 
-- Agent name for `--agent` flag: **`claude`**
-- At session start, ask Claude to run: `holistic start --agent claude`
-- Checkpoints happen automatically after each git commit (post-commit hook)
-- To end a session, ask Claude to run: `holistic handoff`
-- Claude will walk you through the handoff dialog interactively
+Every agent working in this repo should:
 
----
+1. Read [HOLISTIC.md](./HOLISTIC.md) first.
+2. Review [Project History](./.holistic/context/project-history.md), [Regression Watch](./.holistic/context/regression-watch.md), and [Zero-Touch Architecture](./.holistic/context/zero-touch.md) before changing behavior that may already have been fixed.
+3. Read the app-specific adapter in `.holistic/context/adapters/`.
+4. If the Holistic daemon is installed, assume passive capture is already running in the background.
+5. Use the repo-local Holistic helper for explicit recap or recovery flows in this repo.
+6. Recap the current state for the user and ask whether to continue, tweak the plan, or start something new.
+7. Record a checkpoint when focus changes, before likely context compaction, and before handoff.
 
-## Codex
+Use the repo-local Holistic helper in this repo: Windows `.\.holistic\system\holistic.cmd resume --agent <your-agent-name>`; macOS/Linux `./.holistic/system/holistic resume --agent <your-agent-name>`.
 
-- Agent name: **`codex`**
-- Session start: `holistic start --agent codex`
-- Checkpoints: automatic via git hook, or manual with `holistic checkpoint --reason '...'`
-- Session end: `holistic handoff`
+## Handoff Commands
 
----
+-  the repo-local Holistic helper in this repo: Windows `.\.holistic\system\holistic.cmd checkpoint --reason "<why>"`; macOS/Linux `./.holistic/system/holistic checkpoint --reason "<why>"`.
+-  the repo-local Holistic helper in this repo: Windows `.\.holistic\system\holistic.cmd checkpoint --fixed "<bug>" --fix-files "<file>" --fix-risk "<what would reintroduce it>"`; macOS/Linux `./.holistic/system/holistic checkpoint --fixed "<bug>" --fix-files "<file>" --fix-risk "<what would reintroduce it>"`.
+- `holistic set-phase --phase "<id>" --name "<name>" --goal "<goal>"`
+- `holistic complete-phase --phase "<id>" --next-phase "<id>" --next-name "<name>" --next-goal "<goal>"`
+-  the repo-local Holistic helper in this repo: Windows `.\.holistic\system\holistic.cmd handoff`; macOS/Linux `./.holistic/system/holistic handoff`.
+-  the repo-local Holistic helper in this repo: Windows `.\.holistic\system\holistic.cmd start-new --goal "<goal>"`; macOS/Linux `./.holistic/system/holistic start-new --goal "<goal>"`.
+-  the repo-local Holistic helper in this repo: Windows `.\.holistic\system\holistic.cmd watch`; macOS/Linux `./.holistic/system/holistic watch`.
 
-## Antigravity
+## Before Ending a Session
 
-- Agent name: **`antigravity`**
-- Session start: `holistic start --agent antigravity`
-- Checkpoints: automatic via git hook, or manual with `holistic checkpoint --reason '...'`
-- Session end: `holistic handoff`
+## Before ending this session
 
----
+Run:
+```
+holistic handoff --summary "..." --next "..."
+```
+This keeps repo memory current for the next agent.
 
-## Adding a new agent
+## Adding a New Agent Adapter
 
-1. Add the agent name to the `AgentName` type in `src/core/types.ts` (if self-hosting holistic).
-2. Copy one of the adapter sections above and customise it.
-3. Run `holistic checkpoint --reason 'added <agent> adapter docs'` to record it.
+To add instructions for a new agent, create a file at:
 
----
-_Auto-generated by Holistic._
+`.holistic/context/adapters/<agent-name>.md`
+
+Copy any existing adapter as a template and customise the agent name and startup steps.
+Do not edit Holistic source files to register agents - adapters are data, not code.
